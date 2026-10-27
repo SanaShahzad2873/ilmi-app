@@ -1,18 +1,24 @@
+import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { syllabus } from '../data/syllabus'
+import { findTopic } from '../lib/store'
+import { quizzes } from '../data/quizzes'
 
 export default function Topic() {
   const { subjectId, topicId } = useParams()
   const [params] = useSearchParams()
   const year = params.get('year') || '1'
-
-  const subject = syllabus.find((s) => s.id === subjectId)
-  const topic = Object.values(subject?.years || {})
-    .flat()
-    .flatMap((c) => c.topics)
-    .find((t) => t.id === topicId)
+  const { topic } = findTopic(subjectId, topicId)
+  const [videoIndex, setVideoIndex] = useState(0)
 
   if (!topic) return <p>Topic nahi mila.</p>
+
+  const videos = topic.videos?.length
+    ? topic.videos
+    : [{ title: 'Video 1', videoId: topic.videoId || '' }]
+  const current = videos[videoIndex] || videos[0]
+  const qCount = (quizzes[topicId] || []).length
+  const fCount = (topic.flashcards || []).length
+  const base = `/subject/${subjectId}/topic/${topicId}`
 
   return (
     <div>
@@ -21,12 +27,28 @@ export default function Topic() {
       </Link>
       <h2 className="text-xl font-bold my-3">{topic.title}</h2>
 
-      {topic.videoId ? (
+      {videos.length > 1 && (
+        <div className="mb-3 flex gap-2 overflow-x-auto">
+          {videos.map((v, i) => (
+            <button
+              key={i}
+              onClick={() => setVideoIndex(i)}
+              className={`whitespace-nowrap rounded-full px-3 py-1 text-sm ${
+                i === videoIndex ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm'
+              }`}
+            >
+              🎥 {v.title}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {current.videoId ? (
         <div className="aspect-video mb-4">
           <iframe
             className="w-full h-full rounded-xl"
-            src={`https://www.youtube.com/embed/${topic.videoId}`}
-            title={topic.title}
+            src={`https://www.youtube.com/embed/${current.videoId}`}
+            title={current.title}
             allowFullScreen
           />
         </div>
@@ -36,17 +58,44 @@ export default function Topic() {
         </div>
       )}
 
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="mb-4 rounded-xl bg-white p-4 shadow-sm">
         <h3 className="font-semibold mb-2">📝 Notes</h3>
-        <p className="leading-relaxed">{topic.notes}</p>
+        <p className="leading-relaxed whitespace-pre-wrap">{topic.notes}</p>
       </div>
 
-      <Link
-        to={`/subject/${subjectId}/topic/${topicId}/quiz?year=${year}`}
-        className="mt-4 block rounded-lg bg-indigo-600 py-3 text-center font-semibold text-white"
-      >
-        📝 Quiz do
-      </Link>
+      <div className="grid grid-cols-2 gap-3">
+        <ActionCard
+          to={`${base}/flashcards?year=${year}`}
+          icon="🗂️"
+          title="Flashcards"
+          sub={`${fCount} cards`}
+          disabled={fCount === 0}
+        />
+        <ActionCard
+          to={`${base}/quiz?year=${year}`}
+          icon="📝"
+          title="Practice Quiz"
+          sub={`${qCount} sawal`}
+          disabled={qCount === 0}
+        />
+      </div>
     </div>
+  )
+}
+
+function ActionCard({ to, icon, title, sub, disabled }) {
+  const cls = 'rounded-xl bg-white p-4 text-center shadow-sm'
+  const inner = (
+    <>
+      <div className="text-2xl">{icon}</div>
+      <p className="font-semibold">{title}</p>
+      <p className="text-xs text-slate-500">{sub}</p>
+    </>
+  )
+  if (disabled) return <div className={`${cls} opacity-40`}>{inner}</div>
+  return (
+    <Link to={to} className={`${cls} hover:bg-indigo-50`}>
+      {inner}
+    </Link>
   )
 }

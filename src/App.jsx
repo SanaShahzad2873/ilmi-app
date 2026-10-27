@@ -6,6 +6,7 @@ import Quiz from './pages/Quiz'
 import Mistakes from './pages/Mistakes'
 import Dashboard from './pages/Dashboard'
 import Ask from './pages/Ask'
+import Flashcards from './pages/Flashcards'
 
 const tabs = [
   { to: '/', label: 'Home', icon: '🏠', end: true },
@@ -27,9 +28,11 @@ export default function App() {
           <Route path="/subject/:subjectId" element={<Subject />} />
           <Route path="/subject/:subjectId/topic/:topicId" element={<Topic />} />
           <Route path="/subject/:subjectId/topic/:topicId/quiz" element={<Quiz />} />
+          <Route path="/subject/:subjectId/topic/:topicId/flashcards" element={<Flashcards />} />
           <Route path="/mistakes" element={<Mistakes />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/ask" element={<Ask />} />
+
         </Routes>
       </main>
 

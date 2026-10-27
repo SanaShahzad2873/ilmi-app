@@ -14,5 +14,6 @@ export const quizzes = {
     { difficulty: 'medium', q: 'Virus ki ek khasiyat kya hai?', options: ['Sirf host cell ke andar reproduce karte hain', 'Khud khana banate hain', 'Inme nucleus hota hai', 'Cell wall se bane hote hain'], answer: 0 },
     { difficulty: 'medium', q: 'Bacteriophage kya hota hai?', options: ['Bacteria khane wala virus', 'Virus khane wala bacteria', 'Fungus ki qism', 'Protozoa'], answer: 0 },
     { difficulty: 'hard', q: 'Gram-positive bacteria Gram stain ke baad kis rang ke nazar aate hain?', options: ['Purple / Violet', 'Pink / Red', 'Green', 'Rang nahi hota'], answer: 0 },
+    { difficulty: 'easy', q: 'Binomial nomenclature kisne introduce kiya?', options: ['Darwin', 'Linnaeus', 'Mendel', 'Whittaker'], answer: 1, explanation: 'Carolus Linnaeus ne har organism ke liye Genus aur species wala do-lafzi naam introduce kiya.' },
   ],
 }
