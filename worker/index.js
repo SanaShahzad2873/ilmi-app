@@ -33,7 +33,7 @@ export default {
       const subject = String(body.subject || '').trim().slice(0, 50)
       if (!question) return json({ error: 'Sawal likho' }, 400)
 
-      const model = env.GEMINI_MODEL || 'gemini-2.5-flash'
+      const model = env.GEMINI_MODEL || 'gemini-3.8-flash'
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
@@ -50,7 +50,7 @@ export default {
                 parts: [{ text: `Subject: ${subject || 'General'}\nSawal: ${question}` }],
               },
             ],
-            generationConfig: { maxOutputTokens: 2048, temperature: 0.4 },
+            generationConfig: { maxOutputTokens: 4096, temperature: 0.4 },
           }),
         }
       )
