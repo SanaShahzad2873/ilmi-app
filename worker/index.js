@@ -59,7 +59,12 @@ export default {
         return json({ error: 'AI abhi masroof hai (limit khatam). Thori der baad try karo.' }, 429)
       }
       if (!res.ok) {
-        return json({ error: `AI se jawab nahi mila (code ${res.status})` }, 502)
+        let detail = ''
+        try {
+          const err = await res.json()
+          detail = err?.error?.message ? ` - ${String(err.error.message).slice(0, 150)}` : ''
+        } catch {}
+        return json({ error: `AI se jawab nahi mila (code ${res.status}, model ${model})${detail}` }, 502)
       }
 
       const data = await res.json()
