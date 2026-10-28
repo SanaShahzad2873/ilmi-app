@@ -8,13 +8,19 @@ export default function Topic() {
   const [params] = useSearchParams()
   const year = params.get('year') || '1'
   const { topic } = findTopic(subjectId, topicId)
-  const [videoIndex, setVideoIndex] = useState(0)
 
-  if (!topic) return <p>Topic nahi mila.</p>
+  // Topic badalne par video tab khud pehle par wapas aa jaye
+  const [videoState, setVideoState] = useState({ id: topicId, index: 0 })
+  const videoIndex = videoState.id === topicId ? videoState.index : 0
+
+  if (!topic) {
+    return <p>Topic nahi mila.</p>
+  }
 
   const videos = topic.videos?.length
     ? topic.videos
     : [{ title: 'Video 1', videoId: topic.videoId || '' }]
+
   const current = videos[videoIndex] || videos[0]
   const qCount = (quizzes[topicId] || []).length
   const fCount = (topic.flashcards || []).length
@@ -22,33 +28,48 @@ export default function Topic() {
 
   return (
     <div>
-      <Link to={`/subject/${subjectId}?year=${year}`} className="text-sm text-indigo-600">
+      <Link
+        to={`/subject/${subjectId}?year=${year}`}
+        className="text-sm text-indigo-600"
+      >
         ← Wapas
       </Link>
+
       <h2 className="text-xl font-bold my-3">{topic.title}</h2>
+
+      {topic.bookPage && (
+        <p className="mb-3 text-xs text-slate-500">
+          📖 Book: page {topic.bookPage}
+        </p>
+      )}
 
       {videos.length > 1 && (
         <div className="mb-3 flex gap-2 overflow-x-auto">
-          {videos.map((v, i) => (
+          {videos.map((video, index) => (
             <button
-              key={i}
-              onClick={() => setVideoIndex(i)}
+              key={index}
+              type="button"
+              onClick={() => setVideoState({ id: topicId, index })}
               className={`whitespace-nowrap rounded-full px-3 py-1 text-sm ${
-                i === videoIndex ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm'
+                index === videoIndex
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white shadow-sm'
               }`}
             >
-              🎥 {v.title}
+              🎥 {video.title}
             </button>
           ))}
         </div>
       )}
 
-      {current.videoId ? (
+      {current?.videoId ? (
         <div className="aspect-video mb-4">
           <iframe
             className="w-full h-full rounded-xl"
             src={`https://www.youtube.com/embed/${current.videoId}`}
-            title={current.title}
+            title={current.title || topic.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
           />
         </div>
@@ -60,7 +81,9 @@ export default function Topic() {
 
       <div className="mb-4 rounded-xl bg-white p-4 shadow-sm">
         <h3 className="font-semibold mb-2">📝 Notes</h3>
-        <p className="leading-relaxed whitespace-pre-wrap">{topic.notes}</p>
+        <p className="leading-relaxed whitespace-pre-wrap">
+          {topic.notes || 'Notes jald available honge.'}
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -71,6 +94,7 @@ export default function Topic() {
           sub={`${fCount} cards`}
           disabled={fCount === 0}
         />
+
         <ActionCard
           to={`${base}/quiz?year=${year}`}
           icon="📝"
@@ -85,6 +109,7 @@ export default function Topic() {
 
 function ActionCard({ to, icon, title, sub, disabled }) {
   const cls = 'rounded-xl bg-white p-4 text-center shadow-sm'
+
   const inner = (
     <>
       <div className="text-2xl">{icon}</div>
@@ -92,7 +117,11 @@ function ActionCard({ to, icon, title, sub, disabled }) {
       <p className="text-xs text-slate-500">{sub}</p>
     </>
   )
-  if (disabled) return <div className={`${cls} opacity-40`}>{inner}</div>
+
+  if (disabled) {
+    return <div className={`${cls} opacity-40`}>{inner}</div>
+  }
+
   return (
     <Link to={to} className={`${cls} hover:bg-indigo-50`}>
       {inner}
