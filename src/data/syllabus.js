@@ -1,6 +1,7 @@
 
  // years: 1 = 1st Year (11th), 2 = 2nd Year (12th)
 // Chapters ko apni PCTB book ki index se bharo
+import { computerYear1 } from './computer'
 
 export const syllabus = [
   {
@@ -92,7 +93,7 @@ export const syllabus = [
     name: 'Computer Science',
     emoji: '💻',
     years: {
-      1: [],
+      1: computerYear1,
       2: [],
     },
   },
